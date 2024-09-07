@@ -31,7 +31,7 @@ export async function canong7xiiiHandler(
     .getByText(/^3637c001$/gi)
     .waitFor({ state: "attached", timeout: 10000 });
   const addToCartLocator = page.getByText(/add to cart/gi);
-  const lastMessageSentTime = Date.now();
+  const lastMessageSentTime = Date.now() - (20 * 60 * 1000);
 
   try {
     await addToCartLocator.waitFor({ state: "attached", timeout: 10000 });
@@ -51,7 +51,7 @@ export async function canong7xiiiHandler(
   } catch (e) {
     if (process.env.TELEGRAM_CHAT_ID) {
       // send a message only if it's been more than 20 minutes since the last message
-      if (Date.now() - lastMessageSentTime > 20 * 60 * 1000) {
+      if (Date.now() - lastMessageSentTime >= 20 * 60 * 1000) {
         await bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, `${productName} is NOT available.`);
       }
     }

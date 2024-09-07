@@ -22,7 +22,8 @@ export const productPageHandlers = [canong7xiiiHandler];
 
   // const browser = await chromium.launch({ headless: false });
   const browser = await chromium.connectOverCDP("http://localhost:9222");
-
+  const intervalBetweenNotAvailableMessages = 20 * 60 * 1000;
+  let lastMessageSentTime = { value: Date.now() - (intervalBetweenNotAvailableMessages) };
   process.on("SIGINT", async () => {
     console.log("Received SIGINT. Exiting gracefully...");
     await browser.close();
@@ -36,7 +37,7 @@ export const productPageHandlers = [canong7xiiiHandler];
     for (let i = 0; i < productPageHandlers.length; i++) {
       const handler = productPageHandlers[i];
       const page = pages.length <= i ? null : pages[i];
-      const productInfo = await handler(context, page, bot);
+      const productInfo = await handler(context, page, bot, lastMessageSentTime);
       if (!page) {
         pages.push(productInfo.page);
       }

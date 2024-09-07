@@ -5,7 +5,8 @@ import { sleep } from "./utils.js";
 export async function canong7xiiiHandler(
   browserContext: BrowserContext,
   cachedPage: Page | null,
-  bot: Telegraf
+  bot: Telegraf,
+  lastMessageSentTime: { value: number }
 ) {
   console.log("checking Canon G7X Mark III page...");
   const page = await (async () => {
@@ -32,7 +33,6 @@ export async function canong7xiiiHandler(
     .waitFor({ state: "attached", timeout: 10000 });
   const addToCartLocator = page.getByText(/add to cart/gi);
   const intervalBetweenNotAvailableMessages = 20 * 60 * 1000;
-  let lastMessageSentTime = Date.now() - (intervalBetweenNotAvailableMessages);
 
   try {
     await addToCartLocator.waitFor({ state: "attached", timeout: 10000 });
@@ -46,16 +46,16 @@ export async function canong7xiiiHandler(
           process.env.TELEGRAM_CHAT_ID,
           `${productName} is available!`
         );
-        lastMessageSentTime = Date.now();
+        lastMessageSentTime.value = Date.now();
         await sleep(5000);
       }
     }
   } catch (e) {
     if (process.env.TELEGRAM_CHAT_ID) {
       // send a message only if it's been more than 20 minutes since the last message
-      if (Date.now() - lastMessageSentTime >= intervalBetweenNotAvailableMessages) {
+      if (Date.now() - lastMessageSentTime.value >= intervalBetweenNotAvailableMessages) {
         await bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, `${productName} is NOT available yet.`);
-        lastMessageSentTime = Date.now();
+        lastMessageSentTime.value = Date.now();
       }
     }
   }

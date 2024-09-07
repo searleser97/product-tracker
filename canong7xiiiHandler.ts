@@ -20,7 +20,7 @@ export async function canong7xiiiHandler(
   const productName = "Canon G7X Mark III";
   await page.goto(url);
   await page.route("**/*", (route, request) => {
-    if (request.resourceType() === "image") {
+    if (request.resourceType() === "image" || request.resourceType() === "media") {
         route.abort();
     } else {
         route.continue();

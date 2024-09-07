@@ -53,7 +53,7 @@ export async function canong7xiiiHandler(
     if (process.env.TELEGRAM_CHAT_ID) {
       // send a message only if it's been more than 20 minutes since the last message
       if (Date.now() - lastMessageSentTime >= intervalBetweenNotAvailableMessages) {
-        await bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, `${productName} is NOT available.`);
+        await bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, `${productName} is NOT available yet.`);
       }
     }
   }

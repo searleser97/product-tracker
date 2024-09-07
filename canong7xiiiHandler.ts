@@ -31,7 +31,7 @@ export async function canong7xiiiHandler(
     .getByText(/^3637c001$/gi)
     .waitFor({ state: "attached", timeout: 10000 });
   const addToCartLocator = page.getByText(/add to cart/gi);
-  const intervalBetweenNotAvailableMessages = 45 * 60 * 60 * 1000;
+  const intervalBetweenNotAvailableMessages = 45 * 60 * 60 * 60 * 1000;
   const lastMessageSentTime = Date.now() - (intervalBetweenNotAvailableMessages);
 
   try {

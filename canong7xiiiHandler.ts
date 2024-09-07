@@ -31,8 +31,8 @@ export async function canong7xiiiHandler(
     .getByText(/^3637c001$/gi)
     .waitFor({ state: "attached", timeout: 10000 });
   const addToCartLocator = page.getByText(/add to cart/gi);
-  let intervalBetweenNotAvailableMessages = 20 * 60 * 1000;
-  const lastMessageSentTime = Date.now() - (intervalBetweenNotAvailableMessages);
+  const intervalBetweenNotAvailableMessages = 20 * 60 * 1000;
+  let lastMessageSentTime = Date.now() - (intervalBetweenNotAvailableMessages);
 
   try {
     await addToCartLocator.waitFor({ state: "attached", timeout: 10000 });
@@ -46,7 +46,7 @@ export async function canong7xiiiHandler(
           process.env.TELEGRAM_CHAT_ID,
           `${productName} is available!`
         );
-        intervalBetweenNotAvailableMessages = Date.now();
+        lastMessageSentTime = Date.now();
         await sleep(5000);
       }
     }
@@ -55,7 +55,7 @@ export async function canong7xiiiHandler(
       // send a message only if it's been more than 20 minutes since the last message
       if (Date.now() - lastMessageSentTime >= intervalBetweenNotAvailableMessages) {
         await bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, `${productName} is NOT available yet.`);
-        intervalBetweenNotAvailableMessages = Date.now();
+        lastMessageSentTime = Date.now();
       }
     }
   }

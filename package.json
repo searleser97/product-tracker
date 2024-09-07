@@ -3,16 +3,20 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "main.js",
   "scripts": {
-    "start": "node main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "tsc && node --env-file=.env dist/main.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@playwright/browser-chromium": "^1.46.1",
-    "playwright": "^1.46.1"
+    "playwright": "^1.46.1",
+    "telegraf": "^4.16.3",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.1",
+    "typescript": "^5.5.4"
   }
 }

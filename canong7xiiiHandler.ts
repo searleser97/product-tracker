@@ -19,11 +19,19 @@ export async function canong7xiiiHandler(
     "https://www.usa.canon.com/shop/p/powershot-g7-x-mark-iii?color=Black&type=New";
   const productName = "Canon G7X Mark III";
   await page.goto(url);
+  await page.route("**/*", (route, request) => {
+    if (request.resourceType() === "image") {
+        route.abort();
+    } else {
+        route.continue();
+    }
+});
   await page.waitForLoadState("domcontentloaded");
   await page
-    .getByText(/sku: *3637c001/gi)
+    .getByText(/^3637c001$/gi)
     .waitFor({ state: "attached", timeout: 10000 });
   const addToCartLocator = page.getByText(/add to cart/gi);
+  const lastMessageSentTime = Date.now();
 
   try {
     await addToCartLocator.waitFor({ state: "attached", timeout: 10000 });
@@ -40,6 +48,13 @@ export async function canong7xiiiHandler(
         await sleep(5000);
       }
     }
-  } catch (e) {}
+  } catch (e) {
+    if (process.env.TELEGRAM_CHAT_ID) {
+      // send a message only if it's been more than 20 minutes since the last message
+      if (Date.now() - lastMessageSentTime > 20 * 60 * 1000) {
+        await bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, `${productName} is NOT available.`);
+      }
+    }
+  }
   return { page };
 }

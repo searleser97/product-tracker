@@ -41,6 +41,6 @@ export const productPageHandlers = [canong7xiiiHandler];
         pages.push(productInfo.page);
       }
     }
-    await sleep(3000);
+    await sleep(50000);
   }
 })();

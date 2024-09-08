@@ -12,6 +12,6 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     fs.writeFileSync(filename, stdout);
     i++;
     console.log("top command output written to file");
-    await sleep(5000);
+    await sleep(15000);
   }
 })();

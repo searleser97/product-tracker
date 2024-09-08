@@ -8,7 +8,10 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   let i = 0;
   while (true) {
     const { stdout } = spawnSync('top', ['-b', '-n', '1']);
-    fs.writeFileSync(`top_${i}.txt`, stdout);
+    const filename = `top_${i}.txt`;
+    fs.writeFileSync(filename, stdout);
+    i++;
+    console.log("top command output written to file");
     await sleep(5000);
   }
 })();

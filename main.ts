@@ -24,7 +24,7 @@ process.on("SIGINT", async () => {
 });
 bot.start((ctx) => ctx.reply("Welcome!"));
 bot.launch();
-
+bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, "product tracker started, ensure you are signed in to the sites you are tracking");
 const main = (async () => {
 
   const browser = await chromium.connectOverCDP("http://localhost:9222");

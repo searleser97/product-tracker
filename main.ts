@@ -10,10 +10,6 @@ if (!process.env.BOT_TOKEN) {
   console.log("Please set the BOT_TOKEN environment variable.");
   exit(-1);
 }
-if (!process.env.TELEGRAM_CHAT_ID) {
-  console.log("Please set the TELEGRAM_CHAT_ID environment variable.");
-  exit(-1);
-}
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 process.on("SIGINT", async () => {
@@ -21,9 +17,13 @@ process.on("SIGINT", async () => {
   bot.stop();
   process.exit();
 });
-bot.start((ctx) => ctx.reply("Welcome!"));
+let bot_chat_id = 0; 
+bot.start((ctx) => {
+  bot_chat_id = ctx.message.chat.id;
+  ctx.reply("Welcome!")
+
+});
 bot.launch();
-bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, "product tracker started");
 
 const main = (async () => {
   const browser = await chromium.connectOverCDP("http://localhost:9222");
@@ -77,16 +77,16 @@ const main = (async () => {
         lastVisitedTimePerSite[location.siteName] = Date.now();
         if (collectedData.isAvailable) {
           console.log(Date.now(), product.name, `is available at ${SiteEnumReverse[location.siteName]}!`);
-          if (process.env.TELEGRAM_CHAT_ID) {
+          if (bot_chat_id !== 0) {
             if (!fs.existsSync("./screenshots")) {
               fs.mkdirSync("./screenshots");
             }
             const screenshotPath = `./screenshots/${product.name.replace(/ */g, "")}-${SiteEnumReverse[location.siteName]}.png`;
             await page.screenshot({ path: screenshotPath, fullPage: true });
-            await bot.telegram.sendPhoto(process.env.TELEGRAM_CHAT_ID, { source: screenshotPath });
+            await bot.telegram.sendPhoto(bot_chat_id, { source: screenshotPath });
             for (let i = 0; i < 5; i++) {
               await bot.telegram.sendMessage(
-                process.env.TELEGRAM_CHAT_ID,
+                bot_chat_id,
                 `${product.name} is available at ${location.url}!`
               );
               lastMessageSentTime.value = Date.now();
@@ -95,9 +95,9 @@ const main = (async () => {
           }
         } else {
           console.log(Date.now(), product.name, `is NOT yet available at ${SiteEnumReverse[location.siteName]}!`);
-          if (process.env.TELEGRAM_CHAT_ID) {
+          if (bot_chat_id !== 0) {
             if (Date.now() - lastMessageSentTime.value >= intervalBetweenNotAvailableMessages) {
-              await bot.telegram.sendMessage(process.env.TELEGRAM_CHAT_ID, `${product.name} is NOT available yet.`);
+              await bot.telegram.sendMessage(bot_chat_id, `${product.name} is NOT available yet.`);
               lastMessageSentTime.value = Date.now();
             }
           }
@@ -108,17 +108,4 @@ const main = (async () => {
   }
 });
 
-(async () => {
-  while (true) {
-    try {
-      console.log("starting main");
-      await main();
-    } catch (e) {
-      console.log("global error");
-      console.error(e);
-      bot.stop();
-      process.exit();
-    }
-  }
-})();
-
+main();

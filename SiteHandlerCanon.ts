@@ -10,7 +10,7 @@ export async function siteHandlerCanon(
 
   try {
     const addToCartLocator = page.locator("button[type='submit'][title='Add to Cart']").first();
-    await addToCartLocator.waitFor({ state: "attached", timeout: 15000 });
+    await addToCartLocator.waitFor({ state: "attached", timeout: 10000 });
     return { isAvailable: true };
   } catch (e) {
     console.error(e);

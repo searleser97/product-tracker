@@ -4,6 +4,8 @@ import { exit } from "process";
 import { sleep } from "./utils.js";
 import { siteHandlerCanon } from "./SiteHandlerCanon.js";
 import * as fs from "fs";
+import { siteHandlerTarget } from "./SiteHandlerTarget.js";
+import { siteHandlerBestBuy } from "./SiteHandlerBestBuy.js";
 
 
 if (!process.env.BOT_TOKEN) {
@@ -52,6 +54,8 @@ const main = (async () => {
     { 
       name: "Canon G7X Mark III",
       locations: [ 
+        { url: "https://www.bestbuy.com/site/canon-powershot-g7-x-mark-iii-20-1-megapixel-digital-camera-black/6359935.p?skuId=6359935", siteName: SiteEnum.BestBuy },
+        { url: "https://www.target.com/p/canon-powershot-g7-x-mark-iii-20-1-megapixel-digital-camera-black/-/A-91467769", siteName: SiteEnum.Target },
         { url: "https://www.usa.canon.com/shop/p/powershot-g7-x-mark-iii?color=Black&type=New", siteName: SiteEnum.Canon }
        ]
     }
@@ -70,6 +74,10 @@ const main = (async () => {
           switch (location.siteName) {
             case SiteEnum.Canon:
               return siteHandlerCanon(page, location.url);
+            case SiteEnum.Target:
+              return siteHandlerTarget(page, location.url);
+            case SiteEnum.BestBuy:
+              return siteHandlerBestBuy(page, location.url);
             default:
               return { isAvailable: false };
           }
@@ -97,7 +105,7 @@ const main = (async () => {
           console.log(Date.now(), product.name, `is NOT yet available at ${SiteEnumReverse[location.siteName]}!`);
           if (bot_chat_id !== 0) {
             if (Date.now() - lastMessageSentTime.value >= intervalBetweenNotAvailableMessages) {
-              await bot.telegram.sendMessage(bot_chat_id, `${product.name} is NOT available yet.`);
+              // await bot.telegram.sendMessage(bot_chat_id, `${product.name} is NOT available yet.`);
               lastMessageSentTime.value = Date.now();
             }
           }

@@ -29,7 +29,7 @@ bot.launch();
 
 const main = (async () => {
   const browser = await chromium.connectOverCDP("http://localhost:9222");
-  const intervalBetweenNotAvailableMessages = 40 * 60 * 1000;
+  const intervalBetweenNotAvailableMessages = 8 * 60 * 60 * 1000;
   let lastMessageSentTime = { value: Date.now() - (intervalBetweenNotAvailableMessages) };
   const context = browser.contexts()[0];
   const page = await context.newPage();

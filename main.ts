@@ -60,7 +60,7 @@ const main = (async () => {
        ]
     }
   ];
-  const intervalBetweenSameSiteVisit =  45000;
+  const intervalBetweenSameSiteVisit =  20000;
   while (true) {
     for (const product of products) {
       const locations = product.locations;
@@ -92,14 +92,16 @@ const main = (async () => {
             const screenshotPath = `./screenshots/${product.name.replace(/ */g, "")}-${SiteEnumReverse[location.siteName]}.png`;
             await page.screenshot({ path: screenshotPath, fullPage: true });
             await bot.telegram.sendPhoto(bot_chat_id, { source: screenshotPath });
-            for (let i = 0; i < 5; i++) {
-              await bot.telegram.sendMessage(
-                bot_chat_id,
-                `${product.name} is available at ${location.url}!`
-              );
-              lastMessageSentTime.value = Date.now();
-              await sleep(3000);
-            }
+            await bot.telegram.sendMessage(
+              bot_chat_id,
+              `${product.name} is available at ${location.url}!`
+            );
+            await sleep(3000);
+            await bot.telegram.sendMessage(
+              bot_chat_id,
+              `Hurry!`
+            );
+            lastMessageSentTime.value = Date.now();
           }
         } else {
           console.log(Date.now(), product.name, `is NOT yet available at ${SiteEnumReverse[location.siteName]}!`);

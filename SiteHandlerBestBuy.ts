@@ -11,11 +11,11 @@ export async function siteHandlerBestBuy(
   console.log(`domcontentloaded at ${Date.now()}`);
 
   try {
-    const addToCartLocator = page.locator("button[type='button'][data-button-state='ADD_TO_CART']").first();
-    await addToCartLocator.waitFor({ state: "attached", timeout: 10000 });
-    return { isAvailable: true };
+    const addToCartLocator = page.getByLabel("Notify Me");
+    await addToCartLocator.waitFor({ state: "visible", timeout: 10000 });
+    return { isAvailable: false };
   } catch (e) {
     console.error(e);
-    return { isAvailable: false };
+    return { isAvailable: true };
   }
 }

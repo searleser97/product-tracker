@@ -44,3 +44,18 @@ export async function siteHandlerTarget(
   }
   return { isAvailable: false };
 }
+
+export async function autoBuyTarget(page: Page): Promise<void> {
+  const addToCartButtonLocator = page.getByLabel("Add to cart");
+  await addToCartButtonLocator.click();
+  console.log("clicked Add to cart");
+  const protectYourPurchaseButtonLocator = page.locator("button[data-test='espDrawerContent-protectYourPurchasesButton']");
+  await protectYourPurchaseButtonLocator.waitFor({ state: "visible", timeout: 10000 });
+  await protectYourPurchaseButtonLocator.click();
+  const checkoutButtonLocator = page.locator("button[data-test='esp-success-modal-viewCartButton']");
+  await checkoutButtonLocator.waitFor({ state: "visible", timeout: 10000 });
+  await checkoutButtonLocator.click();
+  console.log("clicked protect your purchase");
+  await page.waitForTimeout(10000);
+
+}

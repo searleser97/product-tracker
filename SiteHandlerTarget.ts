@@ -52,10 +52,32 @@ export async function autoBuyTarget(page: Page): Promise<void> {
   const protectYourPurchaseButtonLocator = page.locator("button[data-test='espDrawerContent-protectYourPurchasesButton']");
   await protectYourPurchaseButtonLocator.waitFor({ state: "visible", timeout: 10000 });
   await protectYourPurchaseButtonLocator.click();
-  const checkoutButtonLocator = page.locator("button[data-test='esp-success-modal-viewCartButton']");
+  const checkoutButtonLocator = page.locator("a[data-test='esp-success-modal-viewCartButton']");
   await checkoutButtonLocator.waitFor({ state: "visible", timeout: 10000 });
   await checkoutButtonLocator.click();
-  console.log("clicked protect your purchase");
-  await page.waitForTimeout(10000);
-
+  const checkoutFinalButtonLocator = page.locator("button[data-test='checkout-button']");
+  await checkoutFinalButtonLocator.waitFor({ state: "visible", timeout: 10000 });
+  await checkoutFinalButtonLocator.click();
+  const placeOrderButtonLocator = page.locator("button[data-test='placeOrderButton']");
+  await placeOrderButtonLocator.waitFor({ state: "visible", timeout: 10000 });
+  await placeOrderButtonLocator.click();
+  let resolve = () => {};
+  const myPromise = new Promise<void>((rs) => { resolve = rs; });
+  if (process.env.cvv && process.env.cardNumber) {
+    const cvvlocator = page.getByLabel("Enter CVV");
+    await cvvlocator.waitFor({ state: "visible", timeout: 10000 });
+    await cvvlocator.click();
+    await cvvlocator.pressSequentially(process.env.cvv);
+    const confirmButtonLocator = page.locator("button[data-test='confirm-button']");
+    await confirmButtonLocator.waitFor({ state: "visible", timeout: 10000 });
+    await confirmButtonLocator.click();
+    const cardNumberLocator = page.getByLabel("Confirm card number");
+    await cardNumberLocator.waitFor({ state: "visible", timeout: 10000 });
+    await cardNumberLocator.click();
+    await cardNumberLocator.pressSequentially(process.env.cardNumber);
+    const confirmCardButtonLocator = page.locator("button[data-test='verify-card-button']");
+    await confirmCardButtonLocator.waitFor({ state: "visible", timeout: 10000 });
+    await confirmCardButtonLocator.click();
+  }
+  await myPromise;
 }

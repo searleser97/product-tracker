@@ -4,7 +4,7 @@ import { exit } from "process";
 import { sleep } from "./utils.js";
 import { siteHandlerCanon } from "./SiteHandlerCanon.js";
 import * as fs from "fs";
-import { siteHandlerTarget } from "./SiteHandlerTarget.js";
+import { autoBuyTarget, siteHandlerTarget } from "./SiteHandlerTarget.js";
 import { siteHandlerBestBuy } from "./SiteHandlerBestBuy.js";
 
 
@@ -102,6 +102,12 @@ const main = (async () => {
               `Hurry!`
             );
             lastMessageSentTime.value = Date.now();
+          }
+          switch (location.siteName) {
+            case SiteEnum.Target:
+              console.log("executing autoBuyTarget");
+              await autoBuyTarget(page);
+              break;
           }
         } else {
           console.log(Date.now(), product.name, `is NOT yet available at ${SiteEnumReverse[location.siteName]}!`);

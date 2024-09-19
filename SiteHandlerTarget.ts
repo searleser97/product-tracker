@@ -77,7 +77,7 @@ export async function autoBuyTarget(page: Page): Promise<AutoBuyResult> {
       await cardNumberLocator.pressSequentially(process.env.cardNumber);
       const confirmCardButtonLocator = page.locator("button[data-test='verify-card-button']");
       await confirmCardButtonLocator.waitFor({ state: "visible", timeout: 10000 });
-      // await confirmCardButtonLocator.click();
+      await confirmCardButtonLocator.click();
       return { result: "succeeded" };
     }
     return { result: "failed" };

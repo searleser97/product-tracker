@@ -4,7 +4,7 @@ import { exit } from "process";
 import { sleep } from "./utils.js";
 import { siteHandlerCanon } from "./SiteHandlerCanon.js";
 import * as fs from "fs";
-import { autoBuyTarget, siteHandlerTarget } from "./SiteHandlerTarget.js";
+import { siteHandlerTarget } from "./SiteHandlerTarget.js";
 import { siteHandlerBestBuy } from "./SiteHandlerBestBuy.js";
 
 
@@ -70,7 +70,7 @@ const main = (async () => {
         if (timeLeftBeforeNextVisit > 0) {
           await sleep(timeLeftBeforeNextVisit);
         }
-        const collectedData = await (async () => {
+        const siteHandlerResult = await (async () => {
           switch (location.siteName) {
             case SiteEnum.Canon:
               return siteHandlerCanon(page, location.url);
@@ -82,35 +82,37 @@ const main = (async () => {
               return { isAvailable: false };
           }
         })();
+        const currentSiteName = SiteEnumReverse[location.siteName];
         lastVisitedTimePerSite[location.siteName] = Date.now();
-        if (collectedData.isAvailable) {
-          console.log(Date.now(), product.name, `is available at ${SiteEnumReverse[location.siteName]}!`);
+        if (siteHandlerResult.isAvailable) {
+          console.log(Date.now(), product.name, `is available at ${currentSiteName}!`);
           if (bot_chat_id !== 0) {
-            if (!fs.existsSync("./screenshots")) {
-              fs.mkdirSync("./screenshots");
-            }
-            const screenshotPath = `./screenshots/${product.name.replace(/ */g, "")}-${SiteEnumReverse[location.siteName]}.png`;
-            await page.screenshot({ path: screenshotPath, fullPage: true });
-            await bot.telegram.sendPhoto(bot_chat_id, { source: screenshotPath });
             await bot.telegram.sendMessage(
               bot_chat_id,
               `${product.name} is available at ${location.url}!`
             );
-            await sleep(3000);
-            await bot.telegram.sendMessage(
-              bot_chat_id,
-              `Hurry!`
-            );
             lastMessageSentTime.value = Date.now();
           }
-          switch (location.siteName) {
-            case SiteEnum.Target:
-              console.log("executing autoBuyTarget");
-              await autoBuyTarget(page);
-              break;
+          if (siteHandlerResult.autoBuyPromise) {
+            const autoBuyResult = await siteHandlerResult.autoBuyPromise;
+            console.log("auto buy result:", autoBuyResult);
+            if (bot_chat_id !== 0) {
+              await bot.telegram.sendMessage(
+                bot_chat_id,
+                `Auto Buy at ${currentSiteName} ${autoBuyResult}`
+              );
+            }
+          }
+          if (bot_chat_id !== 0) {
+            if (!fs.existsSync("./screenshots")) {
+              fs.mkdirSync("./screenshots");
+            }
+            const screenshotPath = `./screenshots/${product.name.replace(/ */g, "")}-${currentSiteName}.png`;
+            await page.screenshot({ path: screenshotPath, fullPage: true });
+            await bot.telegram.sendPhoto(bot_chat_id, { source: screenshotPath });
           }
         } else {
-          console.log(Date.now(), product.name, `is NOT yet available at ${SiteEnumReverse[location.siteName]}!`);
+          console.log(Date.now(), product.name, `is NOT yet available at ${currentSiteName}!`);
           if (bot_chat_id !== 0) {
             if (Date.now() - lastMessageSentTime.value >= intervalBetweenNotAvailableMessages) {
               // await bot.telegram.sendMessage(bot_chat_id, `${product.name} is NOT available yet.`);
@@ -119,7 +121,6 @@ const main = (async () => {
           }
         }
       }
-      await sleep(45000);
     }
   }
 });

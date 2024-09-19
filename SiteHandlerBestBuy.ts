@@ -1,11 +1,11 @@
 import { Page, Response } from "playwright";
-import { SiteHandler } from "./types.js";
+import { SiteHandlerResult } from "./types.js";
 
 
 export async function siteHandlerBestBuy(
   page: Page,
   productURL: string,
-): Promise<SiteHandler> {
+): Promise<SiteHandlerResult> {
   await page.goto(productURL);
   await page.waitForLoadState("domcontentloaded");
   console.log(`domcontentloaded at ${Date.now()}`);

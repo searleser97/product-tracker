@@ -1,9 +1,10 @@
 import { Page } from "playwright";
+import { SiteHandlerResult } from "./types.js";
 
 export async function siteHandlerCanon(
   page: Page,
   productURL: string,
-) {
+): Promise<SiteHandlerResult> {
   await page.goto(productURL);
   await page.waitForLoadState("domcontentloaded");
   console.log(`domcontentloaded at ${Date.now()}`);

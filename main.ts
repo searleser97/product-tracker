@@ -6,6 +6,7 @@ import { siteHandlerCanon } from "./SiteHandlerCanon.js";
 import * as fs from "fs";
 import { siteHandlerTarget } from "./SiteHandlerTarget.js";
 import { siteHandlerBestBuy } from "./SiteHandlerBestBuy.js";
+import { siteHandlerApple } from "./SiteHandlerApple.js";
 
 
 if (!process.env.BOT_TOKEN) {
@@ -38,11 +39,13 @@ const main = (async () => {
     Canon: 1,
     BestBuy: 2,
     Target: 3,
+    Apple: 4,
   };
   const SiteEnumReverse = {
     [SiteEnum.Canon]: "Canon",
     [SiteEnum.BestBuy]: "BestBuy",
     [SiteEnum.Target]: "Target",
+    [SiteEnum.Apple]: "Apple",
   };
   const lastVisitedTimePerSite = {
     [SiteEnum.Canon]: 0,
@@ -51,11 +54,17 @@ const main = (async () => {
   };
 
   const products = [
+    {
+      name: "Iphone 16 Pro",
+      locations: [
+        { url: "https://www.apple.com/shop/buy-iphone/iphone-16-pro/6.3-inch-display-128gb-black-titanium-unlocked", siteName: SiteEnum.Apple },
+      ]
+    },
     { 
       name: "Canon G7X Mark III",
       locations: [ 
-        { url: "https://www.bestbuy.com/site/canon-powershot-g7-x-mark-iii-20-1-megapixel-digital-camera-black/6359935.p?skuId=6359935", siteName: SiteEnum.BestBuy },
-        { url: "https://www.target.com/p/canon-powershot-g7-x-mark-iii-20-1-megapixel-digital-camera-black/-/A-91467769", siteName: SiteEnum.Target },
+        // { url: "https://www.bestbuy.com/site/canon-powershot-g7-x-mark-iii-20-1-megapixel-digital-camera-black/6359935.p?skuId=6359935", siteName: SiteEnum.BestBuy },
+        { url: "https://www.target.com/p/minolta-pro-shot-20-mega-pixel-hd-digital-camera-with-67x-optical-zoom-full-1080p-hd-video-16gb-sd-card-black/-/A-92125974", siteName: SiteEnum.Target },
         { url: "https://www.usa.canon.com/shop/p/powershot-g7-x-mark-iii?color=Black&type=New", siteName: SiteEnum.Canon }
        ]
     }
@@ -65,11 +74,13 @@ const main = (async () => {
     for (const product of products) {
       const locations = product.locations;
       for (const location of locations) {
-        console.log(`Checking ${product.name} at ${SiteEnumReverse[location.siteName]}`);
         const timeLeftBeforeNextVisit = Math.max(0, intervalBetweenSameSiteVisit - (Date.now() - lastVisitedTimePerSite[location.siteName]));
+        const currentSiteName = SiteEnumReverse[location.siteName];
         if (timeLeftBeforeNextVisit > 0) {
+          console.log(`waiting ${timeLeftBeforeNextVisit}ms before next visit to ${currentSiteName}`);
           await sleep(timeLeftBeforeNextVisit);
         }
+        console.log(`Checking ${product.name} at ${SiteEnumReverse[location.siteName]}`);
         const siteHandlerResult = await (async () => {
           switch (location.siteName) {
             case SiteEnum.Canon:
@@ -78,11 +89,12 @@ const main = (async () => {
               return siteHandlerTarget(page, location.url);
             case SiteEnum.BestBuy:
               return siteHandlerBestBuy(page, location.url);
+            case SiteEnum.Apple:
+              return siteHandlerApple(page, location.url);
             default:
               return { isAvailable: false };
           }
         })();
-        const currentSiteName = SiteEnumReverse[location.siteName];
         lastVisitedTimePerSite[location.siteName] = Date.now();
         if (siteHandlerResult.isAvailable) {
           console.log(Date.now(), product.name, `is available at ${currentSiteName}!`);

@@ -20,13 +20,13 @@ process.on("SIGINT", async () => {
   bot.stop();
   process.exit();
 });
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
 let bot_chat_id = 0; 
 bot.start((ctx) => {
   bot_chat_id = ctx.message.chat.id;
   ctx.reply("Welcome!")
- fs.writeFileSync("chat_id.txt", bot_chat_id.toString());
+  fs.writeFileSync("chat_id.txt", bot_chat_id.toString());
 });
-bot.launch();
 
 try {
   bot_chat_id = parseInt(fs.readFileSync("chat_id.txt").toString());
@@ -36,6 +36,8 @@ try {
 }
 
 const main = (async () => {
+  bot.launch().catch((e) => { console.log(e); exit(-1); });
+  await sleep(1000);
   const browser = await chromium.connectOverCDP("http://localhost:9222");
   const intervalBetweenNotAvailableMessages = 8 * 60 * 60 * 1000;
   let lastMessageSentTime = { value: Date.now() - (intervalBetweenNotAvailableMessages) };
@@ -127,7 +129,7 @@ const main = (async () => {
               fs.mkdirSync("./screenshots");
             }
             const screenshotPath = `./screenshots/${product.name.replace(/ */g, "")}-${currentSiteName}.png`;
-            await page.screenshot({ path: screenshotPath, fullPage: true });
+            await page.screenshot({ path: screenshotPath });
             await bot.telegram.sendPhoto(bot_chat_id, { source: screenshotPath });
           }
         } else {

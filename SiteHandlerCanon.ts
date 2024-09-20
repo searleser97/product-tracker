@@ -5,16 +5,11 @@ export async function siteHandlerCanon(
   page: Page,
   productURL: string,
 ): Promise<SiteHandlerResult> {
-  await page.goto(productURL);
-  await page.waitForLoadState("domcontentloaded");
-  console.log(`domcontentloaded at ${Date.now()}`);
-
   try {
-    const addToCartLocator = page.locator("button[type='submit'][title='Add to Cart']").first();
-    await addToCartLocator.waitFor({ state: "visible", timeout: 10000 });
-    return { isAvailable: true };
-  } catch (e) {
-    console.error(e);
+    await page.goto(productURL, { waitUntil: "domcontentloaded" });
+    await page.locator('#product_addtocart_form').getByRole('button', { name: 'Notify me when available' }).waitFor({ state: "attached", timeout: 10000 });
     return { isAvailable: false };
+  } catch (e) {
+    return { isAvailable: true };
   }
 }

@@ -7,9 +7,8 @@ export async function siteHandlerApple(
   productURL: string,
 ): Promise<SiteHandlerResult> {
   try {
-    await page.goto(productURL);
-    await page.waitForLoadState("domcontentloaded");
-    await page.getByText('Check back later for').nth(1).waitFor({ state: "attached", timeout: 3000 });
+    await page.goto(productURL, { waitUntil: "domcontentloaded" });
+    await page.getByText('Check back later for').nth(1).waitFor({ state: "attached", timeout: 5000 });
     return { isAvailable: false };
   } catch (_e) {
     return { isAvailable: true };

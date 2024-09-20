@@ -6,12 +6,9 @@ export async function siteHandlerBestBuy(
   page: Page,
   productURL: string,
 ): Promise<SiteHandlerResult> {
-  await page.goto(productURL);
-  await page.waitForLoadState("domcontentloaded");
-  console.log(`domcontentloaded at ${Date.now()}`);
-
   try {
-    await page.getByRole("button", { name: "Sold Out" }).waitFor({ state: "attached", timeout: 3000 });
+    await page.goto(productURL, { waitUntil: "domcontentloaded" });
+    await page.getByRole("button", { name: "Sold Out" }).waitFor({ state: "attached", timeout: 5000 });
     return { isAvailable: false };
   } catch (e) {
     console.error(e);

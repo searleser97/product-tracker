@@ -63,7 +63,7 @@ const main = (async () => {
     { 
       name: "Canon G7X Mark III",
       locations: [ 
-        // { url: "https://www.bestbuy.com/site/canon-powershot-g7-x-mark-iii-20-1-megapixel-digital-camera-black/6359935.p?skuId=6359935", siteName: SiteEnum.BestBuy },
+        { url: "https://www.bestbuy.com/site/canon-powershot-g7-x-mark-iii-20-1-megapixel-digital-camera-black/6359935.p?skuId=6359935", siteName: SiteEnum.BestBuy },
         { url: "https://www.target.com/p/minolta-pro-shot-20-mega-pixel-hd-digital-camera-with-67x-optical-zoom-full-1080p-hd-video-16gb-sd-card-black/-/A-92125974", siteName: SiteEnum.Target },
         { url: "https://www.usa.canon.com/shop/p/powershot-g7-x-mark-iii?color=Black&type=New", siteName: SiteEnum.Canon }
        ]

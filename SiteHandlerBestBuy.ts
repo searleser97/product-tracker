@@ -11,8 +11,7 @@ export async function siteHandlerBestBuy(
   console.log(`domcontentloaded at ${Date.now()}`);
 
   try {
-    const addToCartLocator = page.getByLabel("Notify Me");
-    await addToCartLocator.waitFor({ state: "visible", timeout: 10000 });
+    await page.getByRole("button", { name: "Sold Out" }).waitFor({ state: "attached", timeout: 3000 });
     return { isAvailable: false };
   } catch (e) {
     console.error(e);

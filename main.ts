@@ -24,9 +24,16 @@ let bot_chat_id = 0;
 bot.start((ctx) => {
   bot_chat_id = ctx.message.chat.id;
   ctx.reply("Welcome!")
-
+ fs.writeFileSync("chat_id.txt", bot_chat_id.toString());
 });
 bot.launch();
+
+try {
+  bot_chat_id = parseInt(fs.readFileSync("chat_id.txt").toString());
+  console.log("saved bot chat id", bot_chat_id);
+} catch (_e) {
+  console.log("there is no saved bot chat id");
+}
 
 const main = (async () => {
   const browser = await chromium.connectOverCDP("http://localhost:9222");
